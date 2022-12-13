@@ -1,0 +1,84 @@
+1- Semaphores:
+	1- Define the semaphore:
+		xSemaphoreHandle name;
+		i.e: xSemaphoreHandle LCDSem;
+	
+	2- Create a binary semaphore:
+		vSemaphoreCreateBinary(Semaphore);
+		i.e: vSemaphoreCreateBinary(LCDSem);
+	
+	3- Create a counting semaphore:
+		xSemaphoreCreateCounting(uxMaxCount, uxInitialCount);
+		return : 1- NULL: Semaphore is not created, because no memory
+				 2- Anyother value: handle to the created semaphore
+		i.e: LCDSem = xSemaphoreCreateCounting (1,1);
+		if(LCDSem != NULL)
+		{
+			//Semaphore is successfully created
+		}
+		else
+		{
+			//Semaphore is not created
+		}
+	
+	4- Pend(Take) the semaphore
+		xSemaphoreTake(xSemaphore, xTicksToWait);
+		return : 1- pdPASS: semaphore is taken and decremented
+				 2- pdFAIL: Semaphore isn't available
+		u8 SemState = xSemaphoreTake(LCDSem,10);
+		if(SemState == pdPASS)
+		{
+			//Access the LCD
+			//Give the semaphore
+		}
+		else
+		{
+			//Semaphore isn't available, and the timeout has passed
+		}
+	
+	5- Give(Post) Semaphore
+		xSemaphoreGive(xSemaphore);
+		return : 1- pdPASS: semaphore is given and incremented
+				 2- pdFAIL: Semaphore is at its max count, so it can't be incremented
+				 
+====================================================================================================
+
+2- Queue:
+	1- Define the queue
+		xQueueHandle name;
+		i.e: xQueueHandle Buffer;
+	
+	2- Create the Queue:
+		xQueueCreate(Length, ItemSize);
+		return : 1- NULL: Queue is not created, because no memory
+				 2- Anyother value: handle to the created Queue
+		i.e: Buffer = xQueueCreate(6,sizeof(u8));
+		
+	3- Sending to the queue:
+		xQueueSend(xQueue, *pvItem, xTicksToWait);
+		return : 1- pdPASS: Message is sent
+				 2- pdFAIL: Queue is full
+				 
+	4- Receive from queue:
+		xQueueReceive(xQueue, *pvItem, xTicksToWait);
+		return : 1- pdPASS: Message is read
+				 2- pdFAIL: Queue is empty
+		i.e: u8RecState = xQueueReceive(Buffer, &Var,0);
+		
+====================================================================================================
+
+3- MailBox:
+	
+	1- Define the mailbox: same as queue
+		i.e: xQueueHandle MailBox;
+		
+	2- Create the mailbox: same as queue but with length =1
+		xQueueCreate(1, ItemSize);
+		i.e: MailBox = xQueueCreate(1,sizeof(u8));
+		
+	3- Sending to the mailbox: 
+		xQueueOverWrite(xQueue, *pvItem);
+		
+	4- Receive from the mailbox: (without clearing the message)
+		xQueuePeek(xQueue, *pvItem,xTicksToWait);
+	
